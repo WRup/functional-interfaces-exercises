@@ -5,11 +5,11 @@ public class TestHelper {
         return true;
     }
 
-    static int getHighNumber() {
+    public static int getHighNumber() {
         return 1000;
     }
 
-    static int getLowNumber() {
+    public static int getLowNumber() {
         return 1;
     }
 
@@ -25,15 +25,15 @@ public class TestHelper {
         System.out.println("Bar");
     }
 
-    static RuntimeException createException() {
+    public static RuntimeException createException() {
         return new RuntimeException();
     }
 
-    static void printFirstChar(String string) {
+    public static void printFirstChar(String string) {
         System.out.println(string.charAt(0));
     }
 
-    static void printLastChar(String string) {
+    public static void printLastChar(String string) {
         System.out.println(string.charAt(string.length()-1));
     }
 
