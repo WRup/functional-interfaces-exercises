@@ -5,7 +5,7 @@ import static com.mycompany.app.fluentconditionals.FluentConditionals.when;
 //Task 4
 public class IfThenReturnElseThrow {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
 
         int result3 = when(TestHelper::somethingIsTrue)
                 .thenReturn(TestHelper::getLowNumber)

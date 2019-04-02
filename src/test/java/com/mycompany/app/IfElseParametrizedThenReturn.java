@@ -6,7 +6,7 @@ import static com.mycompany.app.fluentconditionals.FluentConditionals.given;
 //Task 7
 public class IfElseParametrizedThenReturn {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
         int result1 = given("Greetings")
                 .when(TestHelper::somethingIsTrue)
                 .thenReturn(String::length)

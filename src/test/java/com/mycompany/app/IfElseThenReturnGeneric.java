@@ -5,7 +5,7 @@ import static com.mycompany.app.fluentconditionals.FluentConditionals.when;
 //Task 5
 public class IfElseThenReturnGeneric {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
         String string =
                 when(TestHelper::somethingIsTrue)
                         .thenReturn("Yay")

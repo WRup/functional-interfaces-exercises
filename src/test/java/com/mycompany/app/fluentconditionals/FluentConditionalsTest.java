@@ -27,10 +27,10 @@ public class FluentConditionalsTest {
     }
 
     @Test(expectedExceptions = RuntimeException.class)
-    public void testNotThrowingExceptions() {
+    public void testNotThrowingExceptions() throws Throwable {
         Runnable r1 = ()-> System.out.println("nothing");
         RuntimeException e = mock(RuntimeException.class);
-        Supplier<RuntimeException> s = mock(Supplier.class);
+        Supplier<Throwable> s = mock(Supplier.class);
 
 
         FluentConditionals.when(true).then(r1).orElseThrowE(e);
@@ -42,10 +42,10 @@ public class FluentConditionalsTest {
     }
 
     @Test(expectedExceptions = RuntimeException.class)
-    public void testThrowingExceptions() {
+    public void testThrowingExceptions() throws Throwable {
         Runnable r1 = mock(Runnable.class);
         RuntimeException e = mock(RuntimeException.class);
-        Supplier<RuntimeException> s = mock(Supplier.class);
+        Supplier<Throwable> s = mock(Supplier.class);
 
         FluentConditionals.when(false).then(r1).orElseThrowE(e);
         FluentConditionals.when(false).then(r1).orElseThrow(s);
@@ -91,7 +91,7 @@ public class FluentConditionalsTest {
     }
 
     @Test(expectedExceptions = RuntimeException.class)
-    public void testExceptionHandling() throws RuntimeException {
+    public void testExceptionHandling() throws Throwable {
         //Exception exception = mock(RuntimeException.class);
         Runnable runnable = mock(Runnable.class);
 
@@ -99,14 +99,14 @@ public class FluentConditionalsTest {
     }
 
     @Test(expectedExceptions = RuntimeException.class)
-    public void testExceptionHandlingNoSupplier() throws RuntimeException {
+    public void testExceptionHandlingNoSupplier() throws Throwable {
         //Exception exception = mock(RuntimeException.class);
         Runnable runnable = mock(Runnable.class);
         FluentConditionals.when(false).then(runnable).orElseThrow(TestHelper::createException);
     }
 
     @Test
-    public void testExceptionHandlingNoThrowing() throws RuntimeException {
+    public void testExceptionHandlingNoThrowing() throws Throwable {
         //Exception exception = mock(RuntimeException.class);
         Runnable runnable = mock(Runnable.class);
         FluentConditionals.when(true).then(runnable).orElseThrow(TestHelper::createException);

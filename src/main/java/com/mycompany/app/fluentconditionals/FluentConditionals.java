@@ -16,12 +16,12 @@ public class FluentConditionals {
         this.condition = condition;
     }
 
-    public static <T> ElseReturn<T> given(Supplier<T> stringSupplier) {
+    public static <AcceptValue> ElseReturn<AcceptValue> given(Supplier<AcceptValue> stringSupplier) {
         return new ElseReturn<>(stringSupplier.get());
     }
 
-    public static <T> ElseReturn<T> given(T t) {
-        return new ElseReturn<>(t);
+    public static <AcceptValue> ElseReturn<AcceptValue> given(AcceptValue acceptValue) {
+        return new ElseReturn<>(acceptValue);
     }
 
     public static FluentConditionals when(Supplier<Boolean> supplier) {
@@ -32,54 +32,58 @@ public class FluentConditionals {
         return new FluentConditionals(result);
     }
 
-    public <T> ElseReturn<T> then(Runnable runnable) {
+    public <AcceptValue> ElseReturn<AcceptValue> then(Runnable runnable) {
         if (condition)
             runnable.run();
-        return new ElseReturn<>(condition);
+        return new ElseReturn(condition);
     }
 
-    public <T> ElseReturn<T> thenReturn(Supplier<T> t) {
+    public <AcceptValue> ElseReturn<AcceptValue> thenReturn(Supplier<AcceptValue> t) {
         return new ElseReturn<>(condition, t.get());
     }
 
-    public <T> ElseReturn<T> thenReturn(T t) {
-        return new ElseReturn<>(condition, t);
+    public <AcceptValue> ElseReturn<AcceptValue> thenReturn(AcceptValue acceptValue) {
+        return new ElseReturn<>(condition, acceptValue);
+    }
+
+    public <ExceptionTypeName extends Throwable> void thenThrow(Function<String, ExceptionTypeName> rt, String message) throws Throwable {
+        throw rt.apply(message);
     }
 
    public static Runnable doNothing(){
-       return null;
+       return () -> {};
    }
 
 
-    public static class ElseReturn<T> {
-        private T t;
+    public static class ElseReturn<AcceptValue> {
+        private AcceptValue acceptValue;
         private boolean condition;
 
         ElseReturn(boolean condition) {
             this.condition = condition;
         }
 
-        ElseReturn(T t) {
-            this.t = t;
+        ElseReturn(AcceptValue acceptValue) {
+            this.acceptValue = acceptValue;
         }
 
-        ElseReturn(boolean condition, T t) {
+        ElseReturn(boolean condition, AcceptValue acceptValue) {
             this(condition);
-            this.t = t;
+            this.acceptValue = acceptValue;
         }
 
-        public ElseReturn<T> when(boolean condition) {
-            return new ElseReturn<>(condition, t);
+        public ElseReturn<AcceptValue> when(boolean condition) {
+            return new ElseReturn<>(condition, acceptValue);
         }
 
-        public ElseReturn<T> when(Supplier<Boolean> isTrue) {
-            return new ElseReturn<>(isTrue.get(), t);
+        public ElseReturn<AcceptValue> when(Supplier<Boolean> isTrue) {
+            return new ElseReturn<>(isTrue.get(), acceptValue);
         }
 
-        public ElseReturn<T> then(Consumer<T> consumer) {
+        public ElseReturn<AcceptValue> then(Consumer<AcceptValue> consumer) {
             if (condition)
-                consumer.accept(t);
-            return new ElseReturn<>(condition, t);
+                consumer.accept(acceptValue);
+            return new ElseReturn<>(condition, acceptValue);
         }
 
         public void orElse(Runnable t) {
@@ -87,88 +91,98 @@ public class FluentConditionals {
                 t.run();
         }
 
-        public void orElse(Consumer<T> consumer) {
+        public void orElse(Consumer<AcceptValue> consumer) {
             if (!condition)
-                consumer.accept(t);
+                consumer.accept(acceptValue);
         }
 
-        public T orElse(Supplier<T> t) {
+        public AcceptValue orElse(Supplier<AcceptValue> t) {
             return orElse(t.get());
         }
 
-        public T orElse(T t) {
+        public AcceptValue orElse(AcceptValue acceptValue) {
             if (condition)
-                return this.t;
-            return t;
+                return this.acceptValue;
+            return acceptValue;
         }
 
-        public T orElseThrow(Supplier<Exception> e) throws Exception {
+        public AcceptValue orElseThrow(Supplier<Throwable> e) throws Throwable {
             return orElseThrowE(e.get());
         }
 
-        public T orElseThrowE(Exception e) throws Exception {
+        public AcceptValue orElseThrowE(Throwable e) throws Throwable {
             if (!condition)
                 throw e;
-            return t;
+            return acceptValue;
         }
-        public <R> ThenRuter<T,R> thenReturn(Supplier<R> r) {
-            R ret = r.get();
-            return new ThenRuter<>(t, ret, condition);
-        }
-
-        public <R> ThenRuter<T,R> thenReturn(Function<T,R> function) {
-            R ret = function.apply(t);
-            return new ThenRuter<>(t, ret, condition);
+        public <ReturnValue> ThenRuter<AcceptValue, ReturnValue> thenReturn(Supplier<ReturnValue> r) {
+            ReturnValue ret = r.get();
+            return new ThenRuter<>(acceptValue, ret, condition);
         }
 
-        public static class ThenRuter<T, R> {
+        public <ReturnValue> ThenRuter<AcceptValue, ReturnValue> thenReturn(Function<AcceptValue, ReturnValue> function) {
+            ReturnValue ret = function.apply(acceptValue);
+            return new ThenRuter<>(acceptValue, ret, condition);
+        }
 
-            T t;
-            R r;
+        public <ExceptionTypeName extends Throwable> AcceptValue orElseThrow(Function<String, ExceptionTypeName> rt, String message) throws Throwable {
+            ExceptionTypeName apply = rt.apply(message);
+            if(!condition)
+                throw apply;
+            else return acceptValue;
+        }
+
+
+        public static class ThenRuter<AcceptValue, ReturnValue> {
+
+            AcceptValue acceptValue;
+            ReturnValue returnValue;
             boolean condition;
 
 
-            ThenRuter(T t, R r, boolean condition) {
-                this.t = t;
-                this.r = r;
+            ThenRuter(AcceptValue acceptValue, ReturnValue returnValue, boolean condition) {
+                this.acceptValue = acceptValue;
+                this.returnValue = returnValue;
                 this.condition = condition;
             }
 
-            public R orElse(Function<T,R> function) {
+            public ReturnValue orElse(Function<AcceptValue, ReturnValue> function) {
                 if (!condition)
-                    function.apply(t);
-                return r;
+                    function.apply(acceptValue);
+                return returnValue;
             }
 
-            public R orElse(Supplier<R> r){
+            public ReturnValue orElse(Supplier<ReturnValue> r){
                 return orElse(r.get());
             }
 
-            public R orElse(R r){
+            public ReturnValue orElse(ReturnValue returnValue){
                 if(!condition)
-                    return r;
-                return this.r;
+                    return returnValue;
+                return this.returnValue;
             }
 
-            public R orElseThrow(Supplier<RuntimeException> rt){
+            public ReturnValue orElseThrow(Supplier<RuntimeException> rt) throws Throwable {
                 return orElseThrowE(rt.get());
             }
 
-            public R orElseThrow(Supplier<Exception> rt, String message) throws Exception {
-                Exception e = new Exception(message, rt.get());
-                return orElseThrowE(e);
+            public <ExceptionTypeName extends Throwable> ReturnValue orElseThrow(Function<String, ExceptionTypeName> rt, String message) throws Throwable {
+                ExceptionTypeName apply = rt.apply(message);
+                if(!condition)
+                    throw apply;
+                else return returnValue;
             }
 
-            R orElseThrowE(RuntimeException e) {
-                if (!condition)
-                    throw e;
-                return r;
-            }
+//            AcceptValue orElseThrowE(ExceptionTypeName e) throws Throwable {
+//                if (!condition)
+//                    throw e;
+//                return acceptValue;
+//            }
 
-            R orElseThrowE(Exception e) throws Exception {
+            ReturnValue orElseThrowE(Exception e) throws Exception {
                 if (!condition)
                     throw e;
-                return r;
+                return returnValue;
             }
         }
 
